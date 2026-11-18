@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Dreamlight Companion</string>
+    <string name="title_activity_main">Dreamlight Companion</string>
+    <string name="package_name">com.dreamlight.companion</string>
+    <string name="custom_url_scheme">com.dreamlight.companion</string>
+</resources>
