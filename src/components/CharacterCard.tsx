@@ -99,9 +99,18 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
           justifyContent: 'center',
           fontSize: '1.6rem',
           border: isMaxed ? '1px solid var(--accent-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
-          flexShrink: 0
+          flexShrink: 0,
+          overflow: 'hidden'
         }}>
-          {character.avatarEmoji || '✨'}
+          {character.avatarImage ? (
+            <img
+              src={character.avatarImage}
+              alt={character.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            character.avatarEmoji || character.name.charAt(0) || '✨'
+          )}
         </div>
 
         {/* Character Info */}

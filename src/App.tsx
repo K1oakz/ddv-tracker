@@ -10,6 +10,7 @@ import { AddCharacterModal } from './components/AddCharacterModal';
 import { AddSectionModal } from './components/AddSectionModal';
 import { DailyTrackerModal } from './components/DailyTrackerModal';
 import { StatsModal } from './components/StatsModal';
+import { BackupModal } from './components/BackupModal';
 import { SparklesIcon, PlusIcon } from './components/Icons';
 
 const STORAGE_KEY_CHARS = 'ddv_companion_characters_v1';
@@ -74,6 +75,7 @@ export const App: React.FC = () => {
   const [isAddSectionOpen, setIsAddSectionOpen] = useState(false);
   const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+  const [backupModalTab, setBackupModalTab] = useState<'export' | 'import' | null>(null);
 
   // --- Character Handlers ---
   const handleUpdateCharacter = (id: string, updates: Partial<Character>) => {
@@ -130,53 +132,37 @@ export const App: React.FC = () => {
 
   // --- Backup & Restore ---
   const handleExportData = () => {
-    const payload = {
-      app: 'DreamlightValleyCompanion',
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      sections,
-      characters
-    };
-
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ddv_companion_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setBackupModalTab('export');
   };
 
   const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = (e: any) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+    setBackupModalTab('import');
+  };
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsed = JSON.parse(event.target?.result as string);
-          if (parsed && Array.isArray(parsed.characters)) {
-            setCharacters(parsed.characters);
-            if (Array.isArray(parsed.sections)) {
-              setSections(parsed.sections);
-            }
-            alert(`Successfully restored ${parsed.characters.length} characters!`);
-          } else {
-            alert('Invalid backup file format.');
-          }
-        } catch (err) {
-          alert('Could not parse backup file.');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
+  const handleApplyImportedStatus = (data: {
+    characters: Character[];
+    sections?: GameSection[];
+    filters?: FilterOptions;
+  }) => {
+    setCharacters(data.characters);
+    if (data.sections && data.sections.length > 0) {
+      setSections(data.sections);
+    }
+    if (data.filters) {
+      setFilters(prev => ({ ...prev, ...data.filters }));
+    }
+  };
+
+  const handleResetToDefaults = () => {
+    setCharacters(INITIAL_CHARACTERS);
+    setSections(DEFAULT_SECTIONS);
+    setFilters({
+      searchQuery: '',
+      sectionId: 'all',
+      role: 'all',
+      status: 'all',
+      sortBy: 'name'
+    });
   };
 
   // --- Filtered and Sorted Characters ---
@@ -461,6 +447,19 @@ export const App: React.FC = () => {
           sections={sections}
           roles={STANDARD_ROLES}
           onClose={() => setIsStatsModalOpen(false)}
+        />
+      )}
+
+      {backupModalTab && (
+        <BackupModal
+          characters={characters}
+          sections={sections}
+          roles={STANDARD_ROLES}
+          filters={filters}
+          initialTab={backupModalTab}
+          onClose={() => setBackupModalTab(null)}
+          onImportStatus={handleApplyImportedStatus}
+          onResetToDefaults={handleResetToDefaults}
         />
       )}
     </div>

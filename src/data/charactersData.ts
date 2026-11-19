@@ -77,6 +77,14 @@ export const STANDARD_ROLES: CharacterRoleInfo[] = [
     description: 'Finds extra ancient treasures, mist, and fragments'
   },
   {
+    id: 'snippet_catching',
+    name: 'Snippet catching',
+    icon: '🦋',
+    color: '#14b8a6',
+    bgColor: 'rgba(20, 184, 166, 0.15)',
+    description: 'Yields bonus Snippets when catching Snippets with the Royal Net'
+  },
+  {
     id: 'none',
     name: 'Unassigned',
     icon: '⭐',
@@ -856,7 +864,7 @@ export const INITIAL_CHARACTERS: Character[] = [
     name: 'Merida',
     universe: 'Brave',
     sectionId: 'storybook_vale',
-    role: 'foraging',
+    role: 'snippet_catching',
     friendshipLevel: 4,
     status: 'unlocked',
     dailyTalked: false,

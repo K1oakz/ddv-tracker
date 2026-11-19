@@ -25,11 +25,49 @@ export const AddCharacterModal: React.FC<AddCharacterModalProps> = ({
   const [friendshipLevel, setFriendshipLevel] = useState(1);
   const [status, setStatus] = useState<'locked' | 'unlocked' | 'maxed'>('unlocked');
   const [avatarEmoji, setAvatarEmoji] = useState('✨');
+  const [avatarImage, setAvatarImage] = useState('');
   const [houseLocation, setHouseLocation] = useState('Plaza');
   const [favoriteGifts, setFavoriteGifts] = useState<string[]>([]);
   const [giftInput, setGiftInput] = useState('');
   const [questNote, setQuestNote] = useState('');
   const [notes, setNotes] = useState('');
+
+  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUri = ev.target?.result as string;
+      if (!dataUri) return;
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 400;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, w, h);
+          setAvatarImage(canvas.toDataURL('image/jpeg', 0.85));
+        } else {
+          setAvatarImage(dataUri);
+        }
+      };
+      img.src = dataUri;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAddGift = () => {
     if (!giftInput.trim()) return;
@@ -58,6 +96,7 @@ export const AddCharacterModal: React.FC<AddCharacterModalProps> = ({
       houseLocation: houseLocation.trim() || 'Dreamlight Valley',
       notes: notes.trim(),
       avatarEmoji: avatarEmoji.trim() || '✨',
+      avatarImage: avatarImage.trim() || undefined,
       isCustom: true
     };
 
@@ -181,11 +220,11 @@ export const AddCharacterModal: React.FC<AddCharacterModalProps> = ({
 
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6 }}>
-                Emoji Avatar
+                Emoji Avatar / Fallback
               </label>
               <input
                 type="text"
-                placeholder="e.g. 🧚"
+                placeholder="e.g. 🧚 or ✨"
                 value={avatarEmoji}
                 onChange={(e) => setAvatarEmoji(e.target.value)}
                 style={{
@@ -198,6 +237,76 @@ export const AddCharacterModal: React.FC<AddCharacterModalProps> = ({
                   fontSize: '0.85rem'
                 }}
               />
+            </div>
+          </div>
+
+          {/* Custom Portrait Image Upload / Link */}
+          <div style={{
+            background: 'rgba(0, 0, 0, 0.25)',
+            padding: 14,
+            borderRadius: 14,
+            border: '1px solid var(--border-subtle)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10
+          }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              Custom Character Portrait
+            </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <label style={{
+                padding: '8px 14px',
+                borderRadius: 9,
+                background: 'rgba(168, 85, 247, 0.2)',
+                border: '1px solid #a855f7',
+                color: '#e9d5ff',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}>
+                Upload Portrait Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileUpload}
+                  style={{ display: 'none' }}
+                />
+              </label>
+
+              <input
+                type="url"
+                value={avatarImage}
+                onChange={(e) => setAvatarImage(e.target.value)}
+                placeholder="Or paste image URL (https://...)"
+                style={{
+                  flex: 1,
+                  minWidth: 200,
+                  padding: '8px 12px',
+                  borderRadius: 9,
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.8rem'
+                }}
+              />
+
+              {avatarImage && (
+                <button
+                  type="button"
+                  onClick={() => setAvatarImage('')}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 9,
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid #ef4444',
+                    color: '#fca5a5',
+                    fontSize: '0.78rem',
+                    fontWeight: 700
+                  }}
+                >
+                  Remove Image
+                </button>
+              )}
             </div>
           </div>
 

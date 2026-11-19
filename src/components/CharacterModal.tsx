@@ -54,6 +54,44 @@ export const CharacterModal: React.FC<CharacterModalProps> = ({
     onSave(formData);
   };
 
+  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUri = ev.target?.result as string;
+      if (!dataUri) return;
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 400;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          setFormData(prev => ({ ...prev, avatarImage: compressed }));
+        } else {
+          setFormData(prev => ({ ...prev, avatarImage: dataUri }));
+        }
+      };
+      img.src = dataUri;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const selectedRole = roles.find(r => r.id === formData.role);
 
   return (
@@ -82,8 +120,25 @@ export const CharacterModal: React.FC<CharacterModalProps> = ({
           justifyContent: 'space-between',
           background: 'rgba(15, 23, 42, 0.6)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '1.8rem' }}>{formData.avatarEmoji || '✨'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 46,
+              height: 46,
+              borderRadius: 12,
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid var(--border-subtle)',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              {formData.avatarImage ? (
+                <img src={formData.avatarImage} alt={formData.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: '1.6rem' }}>{formData.avatarEmoji || formData.name.charAt(0) || '✨'}</span>
+              )}
+            </div>
             <div>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>{formData.name}</h2>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -179,13 +234,13 @@ export const CharacterModal: React.FC<CharacterModalProps> = ({
 
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6 }}>
-                Avatar Emoji
+                Avatar Emoji / Fallback Icon
               </label>
               <input
                 type="text"
                 value={formData.avatarEmoji || ''}
                 onChange={(e) => setFormData({ ...formData, avatarEmoji: e.target.value })}
-                placeholder="e.g. 🐭"
+                placeholder="e.g. ✨ or 🐭"
                 style={{
                   width: '100%',
                   padding: '9px 12px',
@@ -196,6 +251,76 @@ export const CharacterModal: React.FC<CharacterModalProps> = ({
                   fontSize: '0.85rem'
                 }}
               />
+            </div>
+          </div>
+
+          {/* Custom Portrait Image Upload / Link */}
+          <div style={{
+            background: 'rgba(0, 0, 0, 0.25)',
+            padding: 14,
+            borderRadius: 14,
+            border: '1px solid var(--border-subtle)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10
+          }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              Custom Character Portrait
+            </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <label style={{
+                padding: '8px 14px',
+                borderRadius: 9,
+                background: 'rgba(168, 85, 247, 0.2)',
+                border: '1px solid #a855f7',
+                color: '#e9d5ff',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}>
+                Upload Portrait Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileUpload}
+                  style={{ display: 'none' }}
+                />
+              </label>
+
+              <input
+                type="url"
+                value={formData.avatarImage || ''}
+                onChange={(e) => setFormData({ ...formData, avatarImage: e.target.value })}
+                placeholder="Or paste image URL (https://...)"
+                style={{
+                  flex: 1,
+                  minWidth: 200,
+                  padding: '8px 12px',
+                  borderRadius: 9,
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.8rem'
+                }}
+              />
+
+              {formData.avatarImage && (
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, avatarImage: '' }))}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 9,
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid #ef4444',
+                    color: '#fca5a5',
+                    fontSize: '0.78rem',
+                    fontWeight: 700
+                  }}
+                >
+                  Remove Image
+                </button>
+              )}
             </div>
           </div>
 

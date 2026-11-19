@@ -178,7 +178,15 @@ export const DailyTrackerModal: React.FC<DailyTrackerModalProps> = ({
                 >
                   {/* Left: Avatar & Name */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{character.avatarEmoji || '✨'}</span>
+                    {character.avatarImage ? (
+                      <img
+                        src={character.avatarImage}
+                        alt={character.name}
+                        style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{character.avatarEmoji || character.name.charAt(0) || '✨'}</span>
+                    )}
                     <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

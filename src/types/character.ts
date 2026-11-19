@@ -17,6 +17,7 @@ export type StandardRole =
   | 'foraging'
   | 'digging'
   | 'timebending'
+  | 'snippet_catching'
   | 'none';
 
 export interface CharacterRoleInfo {
@@ -47,6 +48,7 @@ export interface Character {
   notes: string;
   isCustom?: boolean;
   avatarEmoji?: string;
+  avatarImage?: string;
   updatedAt?: number;
 }
 

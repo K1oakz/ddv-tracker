@@ -132,36 +132,42 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onExportData}
-              title="Export Data Backup"
+              title="Export Current App Status"
               style={{
-                padding: 8,
-                borderRadius: 10,
-                background: 'rgba(255, 255, 255, 0.06)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border-subtle)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                gap: 5,
+                padding: '8px 11px',
+                borderRadius: 10,
+                background: 'rgba(56, 189, 248, 0.14)',
+                color: '#7dd3fc',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                fontSize: '0.8rem',
+                fontWeight: 600
               }}
             >
-              <DownloadIcon size={18} />
+              <DownloadIcon size={16} />
+              <span>Export</span>
             </button>
 
             <button
               onClick={onImportData}
-              title="Import Data Backup"
+              title="Import App Status"
               style={{
-                padding: 8,
-                borderRadius: 10,
-                background: 'rgba(255, 255, 255, 0.06)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border-subtle)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                gap: 5,
+                padding: '8px 11px',
+                borderRadius: 10,
+                background: 'rgba(16, 185, 129, 0.14)',
+                color: '#6ee7b7',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                fontSize: '0.8rem',
+                fontWeight: 600
               }}
             >
-              <UploadIcon size={18} />
+              <UploadIcon size={16} />
+              <span>Import</span>
             </button>
 
             <button
